@@ -29,7 +29,7 @@ class OnlineFuzzyART(object):
         self.num_clusters = self.w.shape[0] - 1
         self.clusters = np.zeros(0)
 
-    def run_batch(self, dataset, max_epochs=np.inf):
+    def run_batch(self, dataset, max_epochs=np.inf, seed=None):
         # complement-code the data
         dataset = np.concatenate((dataset, 1 - dataset), axis=1)
 
@@ -41,7 +41,16 @@ class OnlineFuzzyART(object):
         # repeat the learning until either convergence or max_epochs
         while not np.array_equal(self.w, w_old) and iterations < max_epochs:
             w_old = self.w
-            cluster_choices = self.train_dataset(dataset)
+            cluster_choices = np.zeros(dataset.shape[0])
+
+            random.seed(seed)
+            indices = list(range(dataset.shape[0]))
+            random.shuffle(indices)
+
+            # present the input patters to the Fuzzy ART module
+            for ix in indices:
+                cluster_choices[ix] = self.train_pattern(dataset[ix, :])
+
             iterations += 1
 
         # return results
@@ -49,7 +58,7 @@ class OnlineFuzzyART(object):
 
     def run_online(self, data_reader, data_ranges, max_epochs=np.inf, seed=None):
         # initialize variables
-        cluster_choices = []
+        cluster_choices = np.zeros(len(data_reader))
         iterations = 1
         w_old = None
 
@@ -69,21 +78,11 @@ class OnlineFuzzyART(object):
                 normalize(pattern)
                 pattern = np.concatenate((pattern, 1.0 - pattern))
                 choice = self.train_pattern(pattern)
-                if ix >= len(cluster_choices):
-                    cluster_choices.append(choice)
-                else:
-                    cluster_choices[ix] = choice
+                cluster_choices[ix] = choice
             iterations += 1
 
         # return results
         return iterations, np.array(cluster_choices)
-
-    def train_dataset(self, dataset):
-        cluster_choices = np.zeros(dataset.shape[0])
-        # present the input patters to the Fuzzy ART module
-        for ix in range(dataset.shape[0]):
-            cluster_choices[ix] = self.train_pattern(dataset[ix, :])
-        return cluster_choices
 
     def train_pattern(self, pattern):
         # evaluate the pattern to get the winning category
