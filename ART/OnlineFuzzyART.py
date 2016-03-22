@@ -15,6 +15,10 @@ def fuzzy_and(x, y):
     return np.min(np.array([x, y]), 0)
 
 
+def category_choice(pattern, category_w, alpha):
+    return max_norm(fuzzy_and(pattern, category_w)) / (alpha + max_norm(category_w))
+
+
 class OnlineFuzzyART(object):
     def __init__(self, rho, alpha, beta, num_features, w=None):
         self.rho = rho
@@ -97,19 +101,17 @@ class OnlineFuzzyART(object):
 
     def eval_pattern(self, pattern):
         # initialize variables
-        min_norms = np.zeros(self.w.shape[0])
         matches = np.zeros(self.w.shape[0])
         # calculate the category match values
         for jx in range(self.w.shape[0]):
-            min_norms[jx] = max_norm(fuzzy_and(pattern, self.w[jx, :]))
-            matches[jx] = min_norms[jx] / (self.alpha + max_norm(self.w[jx, :]))
+            matches[jx] = category_choice(pattern, self.w[jx, :], self.alpha)
         # pick the winning category
         vigilance_test = self.rho * max_norm(pattern)
         while True:
             # winner-take-all selection
             winner = np.argmax(matches)
             # vigilance test
-            if min_norms[winner] >= vigilance_test:
+            if max_norm(fuzzy_and(pattern, self.w[winner, :])) >= vigilance_test:
                 # the winning category passed the vigilance test
                 return winner
             else:
