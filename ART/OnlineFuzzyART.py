@@ -15,12 +15,12 @@ def fuzzy_and(x, y):
     return np.min(np.array([x, y]), 0)
 
 
-def category_choice(pattern, category_w, alpha):
+def default_category_choice(pattern, category_w, alpha):
     return max_norm(fuzzy_and(pattern, category_w)) / (alpha + max_norm(category_w))
 
 
 class OnlineFuzzyART(object):
-    def __init__(self, rho, alpha, beta, num_features, w=None):
+    def __init__(self, rho, alpha, beta, num_features, choice_fn=default_category_choice, w=None):
         self.rho = rho
         self.alpha = alpha
         self.beta = beta
@@ -28,6 +28,7 @@ class OnlineFuzzyART(object):
         self.w = w if w is not None else np.ones((1, num_features * 2))
         self.num_clusters = self.w.shape[0] - 1
         self.clusters = np.zeros(0)
+        self.choice_fn = choice_fn
 
     def run_batch(self, dataset, max_epochs=np.inf, seed=None):
         # complement-code the data
@@ -103,7 +104,7 @@ class OnlineFuzzyART(object):
         matches = np.zeros(self.w.shape[0])
         # calculate the category match values
         for jx in range(self.w.shape[0]):
-            matches[jx] = category_choice(pattern, self.w[jx, :], self.alpha)
+            matches[jx] = self.choice_fn(pattern, self.w[jx, :], self.alpha)
         # pick the winning category
         vigilance_test = self.rho * max_norm(pattern)
         while True:
