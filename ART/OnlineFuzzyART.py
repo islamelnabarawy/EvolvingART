@@ -107,7 +107,8 @@ class OnlineFuzzyART(object):
             matches[jx] = self.choice_fn(pattern, self.w[jx, :], self.alpha)
         # pick the winning category
         vigilance_test = self.rho * max_norm(pattern)
-        while True:
+        match_attempts = 0
+        while match_attempts < len(matches):
             # winner-take-all selection
             winner = np.argmax(matches)
             # vigilance test
@@ -117,6 +118,8 @@ class OnlineFuzzyART(object):
             else:
                 # shut off this category from further testing
                 matches[winner] = 0
+                match_attempts += 1
+        return len(matches) - 1
 
 
 def main():
