@@ -15,15 +15,13 @@ from data import XCSVFileReader
 
 __author__ = 'Islam Elnabarawy'
 
-creator.create("FitnessMin", base.Fitness, weights=(1.0,))
-creator.create("Individual", list, fitness=creator.FitnessMin)
-
-IND_SIZE = 3
+creator.create("FitnessMax", base.Fitness, weights=(1.0,))
+creator.create("Individual", list, fitness=creator.FitnessMax)
 
 toolbox = base.Toolbox()
 
 toolbox.register("attribute", random.random)
-toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attribute, n=IND_SIZE)
+toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attribute, n=3)
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
 with XCSVFileReader('data/iris.data') as reader:
@@ -57,7 +55,7 @@ mstats.register("max", np.max)
 
 
 def main():
-    pop = toolbox.population(n=50)
+    pop = toolbox.population(n=30)
     hof = tools.HallOfFame(5)
     pop, log = algorithms.eaSimple(pop, toolbox, 0.5, 0.1, 40, stats=mstats, halloffame=hof, verbose=True)
 
