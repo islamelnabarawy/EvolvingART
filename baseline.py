@@ -8,6 +8,8 @@ from data import XCSVFileReader
 
 __author__ = 'Islam Elnabarawy'
 
+rho, alpha, beta = 0.555584128569494, 0.7568376651388451, 0.5837066700986062
+
 
 with XCSVFileReader('data/iris.data') as reader:
     dataset = np.zeros((len(reader), reader.num_fields-1))
@@ -20,7 +22,7 @@ with XCSVFileReader('data/iris.data') as reader:
         dataset[ix, :] = pattern
         labels[ix] = row[4]
 
-fa = OnlineFuzzyART(0.4, 0.001, 0.9, len(data_ranges))
+fa = OnlineFuzzyART(rho, alpha, beta, len(data_ranges))
 iterations, clusters = fa.run_batch(dataset, max_epochs=100, seed=100)
 
 performance = adjusted_rand_score(labels, clusters)
