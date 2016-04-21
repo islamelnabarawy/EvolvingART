@@ -55,9 +55,9 @@ mstats.register("max", np.max)
 
 
 def main():
-    pop = toolbox.population(n=30)
+    pop = toolbox.population(n=50)
     hof = tools.HallOfFame(5)
-    pop, log = algorithms.eaSimple(pop, toolbox, 0.5, 0.1, 40, stats=mstats, halloffame=hof, verbose=True)
+    pop, log = algorithms.eaSimple(pop, toolbox, 0.5, 0.1, 50, stats=mstats, halloffame=hof, verbose=True)
 
     print(hof[0])
 

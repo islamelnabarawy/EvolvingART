@@ -8,7 +8,7 @@ from data import XCSVFileReader
 
 __author__ = 'Islam Elnabarawy'
 
-rho, alpha, beta = 0.555584128569494, 0.7568376651388451, 0.5837066700986062
+rho, alpha, beta = 0.5342327836238868, 0.3119799068437582, 0.5472496744945247
 
 
 with XCSVFileReader('data/iris.data') as reader:
