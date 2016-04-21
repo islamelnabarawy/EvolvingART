@@ -39,12 +39,14 @@ class OnlineFuzzyART(object):
         iterations = 1
         w_old = None
 
+        if seed is not None:
+            random.seed(seed)
+
         # repeat the learning until either convergence or max_epochs
         while not np.array_equal(self.w, w_old) and iterations < max_epochs:
             w_old = self.w
             cluster_choices = np.zeros(dataset.shape[0])
 
-            random.seed(seed)
             indices = list(range(dataset.shape[0]))
             random.shuffle(indices)
 
@@ -63,7 +65,8 @@ class OnlineFuzzyART(object):
         iterations = 1
         w_old = None
 
-        random.seed(seed)
+        if seed is not None:
+            random.seed(seed)
 
         def normalize(p):
             for i in range(len(p)):
