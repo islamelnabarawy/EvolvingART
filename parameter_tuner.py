@@ -14,6 +14,9 @@ from data import read_dataset
 
 __author__ = 'Islam Elnabarawy'
 
+data_file = 'data/iris.data'
+# data_file = 'data/glass.data'
+
 creator.create("FitnessMax", base.Fitness, weights=(1.0,))
 creator.create("Individual", list, fitness=creator.FitnessMax)
 
@@ -23,12 +26,12 @@ toolbox.register("attribute", random.random)
 toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attribute, n=3)
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
-dataset, labels = read_dataset('data/iris.data')
+dataset, labels = read_dataset(data_file)
 
 
 def evaluate(individual):
     fa = OnlineFuzzyART(*individual, dataset.shape[1])
-    iterations, clusters = fa.run_batch(dataset, max_epochs=100, seed=100)
+    iterations, clusters = fa.run_batch(dataset, max_epochs=10, seed=100)
     return adjusted_rand_score(labels, clusters),
 
 toolbox.register("mate", tools.cxTwoPoint)
@@ -49,7 +52,8 @@ def main():
     hof = tools.HallOfFame(5)
     pop, log = algorithms.eaSimple(pop, toolbox, 0.5, 0.1, 50, stats=mstats, halloffame=hof, verbose=True)
 
-    print(hof[0])
+    for expr in hof:
+        print(expr, expr.fitness)
 
     return hof, pop, log
 
