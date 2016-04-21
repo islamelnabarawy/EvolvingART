@@ -9,9 +9,8 @@ import numpy as np
 
 from sklearn.metrics import adjusted_rand_score
 
-import utils
 from ART import OnlineFuzzyART
-from data import XCSVFileReader
+from data import read_dataset
 
 __author__ = 'Islam Elnabarawy'
 
@@ -24,20 +23,11 @@ toolbox.register("attribute", random.random)
 toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attribute, n=3)
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
-with XCSVFileReader('data/iris.data') as reader:
-    dataset = np.zeros((len(reader), reader.num_fields-1))
-    labels = np.zeros((len(reader), ))
-    data_ranges = [(4.3, 7.9), (2.0, 4.4), (1.0, 6.9), (0.1, 2.5)]
-    for ix, row in enumerate(reader):
-        pattern = np.array(row[:4], dtype=float)
-        for i in range(len(pattern)):
-            pattern[i] = utils.scale_range(pattern[i], data_ranges[i])
-        dataset[ix, :] = pattern
-        labels[ix] = row[4]
+dataset, labels = read_dataset('data/iris.data')
 
 
 def evaluate(individual):
-    fa = OnlineFuzzyART(*individual, len(data_ranges))
+    fa = OnlineFuzzyART(*individual, dataset.shape[1])
     iterations, clusters = fa.run_batch(dataset, max_epochs=100, seed=100)
     return adjusted_rand_score(labels, clusters),
 
