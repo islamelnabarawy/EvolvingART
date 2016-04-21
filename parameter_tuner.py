@@ -24,7 +24,7 @@ creator.create("Individual", list, fitness=creator.FitnessMax)
 
 def evaluate(individual, dataset, labels):
     fa = OnlineFuzzyART(*individual, dataset.shape[1])
-    iterations, clusters = fa.run_batch(dataset, max_epochs=10, seed=100)
+    iterations, clusters = fa.run_batch(dataset, max_epochs=20)
     return adjusted_rand_score(labels, clusters),
 
 
