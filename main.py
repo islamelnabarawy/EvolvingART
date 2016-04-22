@@ -32,7 +32,7 @@ def evaluate(individual, compile, dataset, labels):
     # Create a FuzzyART network with the individual's category choice function
     fa = OnlineFuzzyART(rho, alpha, beta, dataset.shape[1], choice_fn=func)
     # Run the clustering on the dataset and find the clusters
-    iterations, clusters = fa.run_batch(dataset, max_epochs=10, seed=100)
+    iterations, clusters = fa.run_batch(dataset, max_epochs=10)
     # return the adjusted rand index for the result
     performance = adjusted_rand_score(labels, clusters)
     # log the result
