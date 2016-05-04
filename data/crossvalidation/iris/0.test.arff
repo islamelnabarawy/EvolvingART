@@ -1,0 +1,24 @@
+@relation iris-weka.filters.unsupervised.attribute.Normalize-S1.0-T0.0
+
+@attribute 'sepal length' numeric
+@attribute 'sepal width' numeric
+@attribute 'petal length' numeric
+@attribute 'petal width' numeric
+@attribute class {Iris-setosa,Iris-versicolor,Iris-virginica}
+
+@data
+0.388889,0.333333,0.59322,0.5,Iris-versicolor
+0.583333,0.375,0.559322,0.5,Iris-versicolor
+0.361111,0.416667,0.59322,0.583333,Iris-versicolor
+0.555556,0.208333,0.661017,0.583333,Iris-versicolor
+0.5,0.333333,0.508475,0.5,Iris-versicolor
+0.194444,0.625,0.101695,0.208333,Iris-setosa
+0.333333,0.916667,0.067797,0.041667,Iris-setosa
+0.388889,1,0.084746,0.125,Iris-setosa
+0.222222,0.541667,0.118644,0.166667,Iris-setosa
+0.166667,0.458333,0.084746,0,Iris-setosa
+0.555556,0.541667,0.847458,1,Iris-virginica
+0.916667,0.416667,0.949153,0.833333,Iris-virginica
+0.861111,0.333333,0.864407,0.75,Iris-virginica
+0.805556,0.416667,0.813559,0.625,Iris-virginica
+0.666667,0.541667,0.79661,1,Iris-virginica
