@@ -1,6 +1,7 @@
 import csv
 
 import numpy as np
+import arff
 
 import utils
 
@@ -19,3 +20,11 @@ def read_dataset(filename):
                 pattern[i] = utils.scale_range(pattern[i], data_ranges[i])
             dataset[ix, :] = pattern
         return dataset, labels
+
+
+def read_arff_dataset(filename):
+    arff_data = arff.load(filename)
+    dataset = np.array([[float(val) for val in row] for row in arff_data], dtype=float)
+    labels = dataset[:, -1]
+    dataset = dataset[:, :-1]
+    return dataset, labels
