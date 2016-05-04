@@ -1,24 +1,24 @@
 @relation iris-weka.filters.unsupervised.attribute.Normalize-S1.0-T0.0
 
-@attribute 'sepal length' numeric
-@attribute 'sepal width' numeric
-@attribute 'petal length' numeric
-@attribute 'petal width' numeric
-@attribute class {Iris-setosa,Iris-versicolor,Iris-virginica}
+@attribute sepal_length numeric
+@attribute sepal_width numeric
+@attribute petal_length numeric
+@attribute petal_width numeric
+@attribute class {1,2,3}
 
 @data
-0.388889,0.333333,0.59322,0.5,Iris-versicolor
-0.583333,0.375,0.559322,0.5,Iris-versicolor
-0.361111,0.416667,0.59322,0.583333,Iris-versicolor
-0.555556,0.208333,0.661017,0.583333,Iris-versicolor
-0.5,0.333333,0.508475,0.5,Iris-versicolor
-0.194444,0.625,0.101695,0.208333,Iris-setosa
-0.333333,0.916667,0.067797,0.041667,Iris-setosa
-0.388889,1,0.084746,0.125,Iris-setosa
-0.222222,0.541667,0.118644,0.166667,Iris-setosa
-0.166667,0.458333,0.084746,0,Iris-setosa
-0.555556,0.541667,0.847458,1,Iris-virginica
-0.916667,0.416667,0.949153,0.833333,Iris-virginica
-0.861111,0.333333,0.864407,0.75,Iris-virginica
-0.805556,0.416667,0.813559,0.625,Iris-virginica
-0.666667,0.541667,0.79661,1,Iris-virginica
+0.5,0.25,0.779661,0.541667,3
+0.166667,0.208333,0.59322,0.666667,3
+0.611111,0.416667,0.813559,0.875,3
+0.833333,0.375,0.898305,0.708333,3
+0.416667,0.291667,0.694915,0.75,3
+0.222222,0.208333,0.338983,0.416667,2
+0.388889,0.333333,0.59322,0.5,2
+0.416667,0.291667,0.525424,0.375,2
+0.166667,0.166667,0.389831,0.375,2
+0.333333,0.125,0.508475,0.5,2
+0.305556,0.791667,0.118644,0.125,1
+0.388889,0.75,0.118644,0.083333,1
+0.333333,0.625,0.050847,0.041667,1
+0.222222,0.583333,0.084746,0.041667,1
+0.222222,0.625,0.067797,0.041667,1
