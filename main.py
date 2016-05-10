@@ -12,17 +12,23 @@ from numpy import linalg as la
 
 from sklearn.metrics import adjusted_rand_score
 
-from data import read_dataset
+from data.read_dataset import read_arff_dataset
 from ART import OnlineFuzzyART
 
 __author__ = 'Islam Elnabarawy'
 
 # FuzzyART algorithm parameters
-rho, alpha, beta = 0.5173929115731474, 0.47460905154087896, 0.6250151337909732   # iris.data
+rho, alpha, beta = 0.6, 0.05, 0.95
+# rho, alpha, beta = 0.5173929115731474, 0.47460905154087896, 0.6250151337909732   # iris.data
 # rho, alpha, beta = 0.4249555132101839, 0.0011891228422072908, 0.5315274236032594   # glass.data
 
 data_file = 'data/iris.data'
 # data_file = 'data/glass.data'
+
+NUM_FOLDS = 10
+dataset_name = 'iris'
+test_file_format = 'data/crossvalidation/' + dataset_name + '/{0}.test.arff'
+train_file_format = 'data/crossvalidation/' + dataset_name + '/{0}.train.arff'
 
 
 def evaluate(individual, compile, dataset, labels):
@@ -77,7 +83,7 @@ creator.create("FitnessMax", base.Fitness, weights=(1.0,))
 creator.create("Individual", gp.PrimitiveTree, fitness=creator.FitnessMax)
 
 
-def main():
+def run_fold(index):
     pset = get_primitive_set()
 
     toolbox = base.Toolbox()
@@ -89,9 +95,10 @@ def main():
     pool = multiprocessing.Pool()
     toolbox.register("map", pool.map)
 
-    dataset, labels = read_dataset(data_file)
+    train_dataset, train_labels = read_arff_dataset(train_file_format.format(index))
+    test_dataset, test_labels = read_arff_dataset(test_file_format.format(index))
 
-    toolbox.register("evaluate", evaluate, compile=toolbox.compile, dataset=dataset, labels=labels)
+    toolbox.register("evaluate", evaluate, compile=toolbox.compile, dataset=train_dataset, labels=train_labels)
     toolbox.register("select", tools.selTournament, tournsize=3)
     toolbox.register("mate", gp.cxOnePoint)
     toolbox.register("expr_mut", gp.genFull, min_=0, max_=2)
@@ -116,7 +123,23 @@ def main():
     for expr in hof:
         print('\t', expr, expr.fitness)
 
+    print("Training set fitness:")
+    for expr in hof:
+        train_fitness = evaluate(expr, toolbox.compile, train_dataset, train_labels)
+        print('\t', expr, train_fitness)
+
+    print("Test set fitness:")
+    for expr in hof:
+        test_fitness = evaluate(expr, toolbox.compile, test_dataset, test_labels)
+        print('\t', expr, test_fitness)
+
     return pop, hof, log
+
+
+def main():
+    for index in range(10):
+        run_fold(index)
+
 
 if __name__ == '__main__':
     main()
