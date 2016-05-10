@@ -11,11 +11,11 @@ import numpy as np
 from sklearn.metrics import adjusted_rand_score
 
 from ART import OnlineFuzzyART
-from data import read_dataset
+from data.read_dataset import read_arff_dataset
 
 __author__ = 'Islam Elnabarawy'
 
-data_file = 'data/iris.data'
+data_file = 'data/crossvalidation/iris_norm.arff'
 # data_file = 'data/glass.data'
 
 creator.create("FitnessMax", base.Fitness, weights=(1.0,))
@@ -24,7 +24,7 @@ creator.create("Individual", list, fitness=creator.FitnessMax)
 
 def evaluate(individual, dataset, labels):
     fa = OnlineFuzzyART(*individual, dataset.shape[1])
-    iterations, clusters = fa.run_batch(dataset, max_epochs=20)
+    iterations, clusters = fa.run_batch(dataset, max_epochs=10)
     return adjusted_rand_score(labels, clusters),
 
 
@@ -38,7 +38,7 @@ def main():
     pool = multiprocessing.Pool()
     toolbox.register("map", pool.map)
 
-    dataset, labels = read_dataset(data_file)
+    dataset, labels = read_arff_dataset(data_file)
 
     toolbox.register("mate", tools.cxTwoPoint)
     toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=1, indpb=0.1)
