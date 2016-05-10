@@ -8,7 +8,8 @@ from ART import OnlineFuzzyART
 
 __author__ = 'Islam Elnabarawy'
 
-rho, alpha, beta = 0.5173929115731474, 0.47460905154087896, 0.6250151337909732   # iris.data
+rho, alpha, beta = 0.6, 0.05, 0.95
+# rho, alpha, beta = 0.5173929115731474, 0.47460905154087896, 0.6250151337909732       # iris.data
 # rho, alpha, beta = 0.4249555132101839, 0.0011891228422072908, 0.5315274236032594     # glass.data
 
 NUM_FOLDS = 10
@@ -20,7 +21,7 @@ train_file_format = 'data/crossvalidation/' + dataset_name + '/{0}.train.arff'
 def evaluate_train(index):
     dataset, labels = read_arff_dataset(train_file_format.format(index))
     fa = OnlineFuzzyART(rho, alpha, beta, dataset.shape[1])
-    iterations, clusters = fa.run_batch(dataset, max_epochs=100)
+    iterations, clusters = fa.run_batch(dataset, max_epochs=10)
     performance = adjusted_rand_score(labels, clusters)
     return index, iterations, fa.num_clusters, performance
 
@@ -28,7 +29,7 @@ def evaluate_train(index):
 def evaluate_test(index):
     dataset, labels = read_arff_dataset(test_file_format.format(index))
     fa = OnlineFuzzyART(rho, alpha, beta, dataset.shape[1])
-    iterations, clusters = fa.run_batch(dataset, max_epochs=100)
+    iterations, clusters = fa.run_batch(dataset, max_epochs=10)
     performance = adjusted_rand_score(labels, clusters)
     return index, iterations, fa.num_clusters, performance
 
