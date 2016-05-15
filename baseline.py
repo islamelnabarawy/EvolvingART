@@ -13,7 +13,7 @@ rho, alpha, beta = 0.6, 0.05, 0.95
 # rho, alpha, beta = 0.4249555132101839, 0.0011891228422072908, 0.5315274236032594     # glass.data
 
 NUM_FOLDS = 10
-dataset_name = 'iris'
+dataset_name = 'wine'
 test_file_format = 'data/crossvalidation/' + dataset_name + '/{0}.test.arff'
 train_file_format = 'data/crossvalidation/' + dataset_name + '/{0}.train.arff'
 
