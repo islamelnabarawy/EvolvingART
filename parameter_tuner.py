@@ -28,7 +28,7 @@ def evaluate(individual, dataset, labels):
     return adjusted_rand_score(labels, clusters),
 
 
-def main():
+def main(npop, ngen, cxpb, mutpb):
     toolbox = base.Toolbox()
 
     toolbox.register("attribute", random.random)
@@ -52,9 +52,9 @@ def main():
     mstats.register("min", np.min)
     mstats.register("max", np.max)
 
-    pop = toolbox.population(n=50)
+    pop = toolbox.population(n=npop)
     hof = tools.HallOfFame(5)
-    pop, log = algorithms.eaSimple(pop, toolbox, 0.5, 0.1, 50, stats=mstats, halloffame=hof, verbose=True)
+    pop, log = algorithms.eaSimple(pop, toolbox, cxpb, mutpb, ngen, stats=mstats, halloffame=hof, verbose=True)
 
     for expr in hof:
         print(expr, expr.fitness)
@@ -63,4 +63,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    npop, ngen, cxpb, mutpb = 50, 50, 0.5, 0.1
+    main(npop, ngen, cxpb, mutpb)
