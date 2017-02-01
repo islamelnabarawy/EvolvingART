@@ -1,3 +1,4 @@
+import argparse
 import operator
 import multiprocessing
 
@@ -139,13 +140,23 @@ def run_fold(index):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--fold", choices=[str(i) for i in range(NUM_FOLDS)],
+                        help="The index of the fold to evaluate")
+    args = parser.parse_args()
+
     print("Dataset: %s" % dataset_name)
     print("Num folds: %s " % NUM_FOLDS)
     print()
-    for index in range(NUM_FOLDS):
-        print("Starting fold %s...\n\n" % index)
-        run_fold(index)
-        print("\nFold %s done.\n" % index)
+    if args.fold is not None:
+        print("Starting fold %s...\n\n" % args.fold)
+        run_fold(args.fold)
+        print("\nFold %s done.\n" % args.fold)
+    else:
+        for index in range(NUM_FOLDS):
+            print("Starting fold %s...\n\n" % index)
+            run_fold(index)
+            print("\nFold %s done.\n" % index)
 
 
 if __name__ == '__main__':
