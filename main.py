@@ -52,6 +52,10 @@ def fuzzy_and(x, y):
     return np.min(np.array([x, y]), 0)
 
 
+def fuzzy_or(x, y):
+    return np.max(np.array([x, y]), 0)
+
+
 def protected_div(left, right):
     try:
         return left / right
@@ -63,12 +67,13 @@ def get_primitive_set():
 
     pset = gp.PrimitiveSetTyped("main", [np.ndarray, np.ndarray, float], float)
     pset.addPrimitive(operator.add, [float, float], float)
-    # pset.addPrimitive(operator.sub, [float, float], float)
-    # pset.addPrimitive(operator.mul, [float, float], float)
+    pset.addPrimitive(operator.sub, [float, float], float)
+    pset.addPrimitive(operator.mul, [float, float], float)
     pset.addPrimitive(protected_div, [float, float], float)
     # pset.addPrimitive(operator.neg, [float], float)
     pset.addPrimitive(max_norm, [np.ndarray], float)
     pset.addPrimitive(fuzzy_and, [np.ndarray, np.ndarray], np.ndarray)
+    pset.addPrimitive(fuzzy_or, [np.ndarray, np.ndarray], np.ndarray)
 
     pset.renameArguments(ARG0="A")
     pset.renameArguments(ARG1="w_j")
