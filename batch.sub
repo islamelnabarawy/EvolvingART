@@ -7,6 +7,6 @@
 #SBATCH --time=0-23:59:59 
 #SBATCH --mail-type=begin,end,fail,requeue 
 #SBATCH --export=all 
-#SBATCH --out=output/Forge-%j-%n-%a.out 
+#SBATCH --out=output/%A/Forge-%j-%n-%a.out
 
 python main.py wine ${SLURM_ARRAY_TASK_ID}
