@@ -143,7 +143,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("dataset", choices=['wine', 'iris', 'glass'],
                         help="The index of the fold to evaluate")
-    parser.add_argument("fold", choices=[str(i) for i in range(NUM_FOLDS)],
+    parser.add_argument("fold", type=int, choices=range(NUM_FOLDS),
                         help="The index of the fold to evaluate")
     args = parser.parse_args()
 
