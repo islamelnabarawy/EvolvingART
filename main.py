@@ -24,9 +24,6 @@ rho, alpha, beta = 0.6, 0.05, 0.95
 # rho, alpha, beta = 0.4249555132101839, 0.0011891228422072908, 0.5315274236032594   # glass.data
 
 NUM_FOLDS = 10
-dataset_name = 'wine'
-test_file_format = 'data/crossvalidation/' + dataset_name + '/{0}.test.arff'
-train_file_format = 'data/crossvalidation/' + dataset_name + '/{0}.train.arff'
 
 
 def evaluate(individual, compile, dataset, labels):
@@ -65,7 +62,6 @@ def protected_div(left, right):
 
 
 def get_primitive_set():
-
     pset = gp.PrimitiveSetTyped("main", [np.ndarray, np.ndarray, float], float)
     pset.addPrimitive(operator.add, [float, float], float)
     pset.addPrimitive(operator.sub, [float, float], float)
@@ -86,7 +82,11 @@ creator.create("FitnessMax", base.Fitness, weights=(1.0,))
 creator.create("Individual", gp.PrimitiveTree, fitness=creator.FitnessMax)
 
 
-def run_fold(index):
+def run_fold(dataset_name, fold_index):
+
+    train_file = 'data/crossvalidation/{}/{}.train.arff'.format(dataset_name, fold_index)
+    test_file = 'data/crossvalidation/{}/{}.test.arff'.format(dataset_name, fold_index)
+
     pset = get_primitive_set()
 
     toolbox = base.Toolbox()
@@ -98,8 +98,8 @@ def run_fold(index):
     pool = multiprocessing.Pool()
     toolbox.register("map", pool.map)
 
-    train_dataset, train_labels = read_arff_dataset(train_file_format.format(index))
-    test_dataset, test_labels = read_arff_dataset(test_file_format.format(index))
+    train_dataset, train_labels = read_arff_dataset(train_file)
+    test_dataset, test_labels = read_arff_dataset(test_file)
 
     toolbox.register("evaluate", evaluate, compile=toolbox.compile, dataset=train_dataset, labels=train_labels)
     toolbox.register("select", tools.selTournament, tournsize=3)
@@ -140,15 +140,17 @@ def run_fold(index):
 
 
 def main():
-    fold = input()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("dataset", choices=['wine', 'iris', 'glass'],
+                        help="The index of the fold to evaluate")
+    parser.add_argument("fold", choices=[str(i) for i in range(NUM_FOLDS)],
+                        help="The index of the fold to evaluate")
+    args = parser.parse_args()
 
-    print("Dataset: %s" % dataset_name)
-    print("Num folds: %s " % NUM_FOLDS)
-    print()
-
-    print("Starting fold %s...\n\n" % fold)
-    run_fold(fold)
-    print("\nFold %s done.\n" % fold)
+    print("Dataset: {}".format(args.dataset))
+    print("Fold: {}/{}\n".format(args.fold+1, NUM_FOLDS))
+    run_fold(args.dataset, args.fold)
+    print("\nFold {}/{} done.\n".format(args.fold+1, NUM_FOLDS))
 
 
 if __name__ == '__main__':
