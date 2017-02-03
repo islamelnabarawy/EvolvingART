@@ -174,3 +174,7 @@ ENV/
 # Spyder project settings
 .spyderproject
 # Created by .ignore support plugin (hsz.mobi)
+
+# added manually
+output/
+.idea/
