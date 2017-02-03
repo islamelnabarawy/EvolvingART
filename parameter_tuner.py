@@ -27,7 +27,7 @@ def evaluate(individual, dataset, labels):
     return adjusted_rand_score(labels, clusters),
 
 
-def hypertune(dataset_name, npop, ngen, cxpb, mutpb):
+def hypertune(dataset_name, npop, ngen, cxpb, mutpb, indpb, mu, lambda_):
     toolbox = base.Toolbox()
 
     toolbox.register("attribute", random.random)
@@ -40,9 +40,9 @@ def hypertune(dataset_name, npop, ngen, cxpb, mutpb):
     data_file = 'data/crossvalidation/{}_norm.arff'.format(dataset_name)
     dataset, labels = read_arff_dataset(data_file)
 
-    toolbox.register("mate", tools.cxTwoPoint)
-    toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=1, indpb=0.1)
-    toolbox.register("select", tools.selTournament, tournsize=3)
+    toolbox.register("mate", tools.cxOnePoint)
+    toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=1, indpb=indpb)
+    toolbox.register("select", tools.selBest)
     toolbox.register("evaluate", evaluate, dataset=dataset, labels=labels)
 
     stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
@@ -54,7 +54,8 @@ def hypertune(dataset_name, npop, ngen, cxpb, mutpb):
 
     pop = toolbox.population(n=npop)
     hof = tools.HallOfFame(5)
-    pop, log = algorithms.eaSimple(pop, toolbox, cxpb, mutpb, ngen, stats=mstats, halloffame=hof, verbose=True)
+    pop, log = algorithms.eaMuPlusLambda(pop, toolbox, mu, lambda_, cxpb, mutpb, ngen,
+                                         stats=mstats, halloffame=hof, verbose=True)
 
     for expr in hof:
         print(expr, expr.fitness)
@@ -73,10 +74,13 @@ def main():
 
     params = {
         'dataset_name': args.dataset,
-        'npop': 50,
+        'npop': 100,
         'ngen': 500,
         'cxpb': 0.5,
-        'mutpb': 0.1
+        'mutpb': 0.1,
+        'indpb': 0.1,
+        'mu': 100,
+        'lambda_': 20
     }
     hof, pop, log = hypertune(**params)
     with open(args.output, "wb") as file_out:
