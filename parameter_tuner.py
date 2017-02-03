@@ -1,5 +1,7 @@
+import argparse
 import random
 import multiprocessing
+import pickle
 
 from deap import base
 from deap import creator
@@ -15,9 +17,6 @@ from data.read_dataset import read_arff_dataset
 
 __author__ = 'Islam Elnabarawy'
 
-data_file = 'data/crossvalidation/iris_norm.arff'
-# data_file = 'data/glass.data'
-
 creator.create("FitnessMax", base.Fitness, weights=(1.0,))
 creator.create("Individual", list, fitness=creator.FitnessMax)
 
@@ -28,7 +27,7 @@ def evaluate(individual, dataset, labels):
     return adjusted_rand_score(labels, clusters),
 
 
-def main(npop, ngen, cxpb, mutpb):
+def hypertune(dataset_name, npop, ngen, cxpb, mutpb):
     toolbox = base.Toolbox()
 
     toolbox.register("attribute", random.random)
@@ -38,6 +37,7 @@ def main(npop, ngen, cxpb, mutpb):
     pool = multiprocessing.Pool()
     toolbox.register("map", pool.map)
 
+    data_file = 'data/crossvalidation/{}_norm.arff'.format(dataset_name)
     dataset, labels = read_arff_dataset(data_file)
 
     toolbox.register("mate", tools.cxTwoPoint)
@@ -62,6 +62,26 @@ def main(npop, ngen, cxpb, mutpb):
     return hof, pop, log
 
 
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("dataset", choices=['wine', 'iris', 'glass'],
+                        help="The index of the fold to tune on")
+    parser.add_argument("output", help="Name of the output file to save the results to")
+    args = parser.parse_args()
+
+    print("Dataset: {}".format(args.dataset))
+
+    params = {
+        'dataset_name': args.dataset,
+        'npop': 50,
+        'ngen': 500,
+        'cxpb': 0.5,
+        'mutpb': 0.1
+    }
+    hof, pop, log = hypertune(**params)
+    with open(args.output, "wb") as file_out:
+        pickle.dump(dict(population=pop, halloffame=hof, logbook=log, params=params), file_out)
+
+
 if __name__ == '__main__':
-    npop, ngen, cxpb, mutpb = 50, 50, 0.5, 0.1
-    main(npop, ngen, cxpb, mutpb)
+    main()
