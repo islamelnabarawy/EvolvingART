@@ -2,6 +2,7 @@ import multiprocessing
 
 import numpy as np
 from sklearn.metrics import adjusted_rand_score
+from prettytable import PrettyTable
 
 from data.read_dataset import read_arff_dataset
 from ART import OnlineFuzzyART
@@ -45,13 +46,13 @@ def main():
 
 
 def print_results(results):
-    print('%-4s\t%-4s\t%-8s\t%s' % ('Idx', 'Iter', 'Clusters', 'Performance'))
-    print('-' * 50)
+    x = PrettyTable()
+    x.field_names = ['Idx', 'Iter', 'Clusters', 'Performance']
     for row in results:
-        print('%-4s\t%-4s\t%-8s\t%s' % row)
-    print('-' * 50)
+        x.add_row(row)
     avg = np.array(results, dtype=float)[:, 1:].mean(axis=0)
-    print('Avg:\t%-4s\t%-8s\t%s' % tuple(avg))
+    x.add_row(['Avg'] + list(avg))
+    print(x)
 
 
 if __name__ == '__main__':
