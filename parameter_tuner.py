@@ -76,9 +76,9 @@ def main():
         'dataset_name': args.dataset,
         'npop': 100,
         'ngen': 500,
-        'cxpb': 0.5,
-        'mutpb': 0.1,
-        'indpb': 0.1,
+        'cxpb': 0.95,
+        'mutpb': 0.05,
+        'indpb': 0.05,
         'mu': 100,
         'lambda_': 20
     }
