@@ -102,7 +102,7 @@ def run_fold(dataset_name, fold_index):
     test_dataset, test_labels = read_arff_dataset(test_file)
 
     toolbox.register("evaluate", evaluate, compile=toolbox.compile, dataset=train_dataset, labels=train_labels)
-    toolbox.register("select", tools.selTournament, tournsize=3)
+    toolbox.register("select", tools.selBest)
     toolbox.register("mate", gp.cxOnePoint)
     toolbox.register("expr_mut", gp.genFull, min_=0, max_=2)
     toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
@@ -118,9 +118,10 @@ def run_fold(dataset_name, fold_index):
     mstats.register("min", np.min)
     mstats.register("max", np.max)
 
-    pop = toolbox.population(n=50)
+    pop = toolbox.population(n=100)
     hof = tools.HallOfFame(3)
-    pop, log = algorithms.eaSimple(pop, toolbox, 0.5, 0.3, 40, stats=mstats, halloffame=hof, verbose=True)
+    pop, log = algorithms.eaMuPlusLambda(pop, toolbox, 100, 20, 0.95, 0.05, 500,
+                                         stats=mstats, halloffame=hof, verbose=True)
 
     print("Hall of fame:")
     for expr in hof:
