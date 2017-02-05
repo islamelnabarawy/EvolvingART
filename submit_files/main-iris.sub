@@ -1,0 +1,12 @@
+#!/bin/bash
+#SBATCH --job-name=EA-iris
+#SBATCH --ntasks=4
+#SBATCH --nodes=1
+#SBATCH --array=0-9%10
+#SBATCH --mem=8192
+#SBATCH --time=2-0:0:0 
+#SBATCH --mail-type=begin,end,fail,requeue 
+#SBATCH --export=all 
+#SBATCH --out=output/main/iris-%A-%n-%a.out
+
+python main.py iris ${SLURM_ARRAY_TASK_ID}

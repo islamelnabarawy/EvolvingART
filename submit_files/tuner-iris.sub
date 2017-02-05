@@ -1,0 +1,11 @@
+#!/bin/bash
+#SBATCH --job-name=PT-iris
+#SBATCH --ntasks=4
+#SBATCH --nodes=1
+#SBATCH --mem=8192
+#SBATCH --time=0-23:59:59 
+#SBATCH --mail-type=begin,end,fail,requeue 
+#SBATCH --export=all 
+#SBATCH --out=output/tuner/tuner-iris-%j.out
+
+python parameter_tuner.py iris output/tuner/tuner-iris-${SLURM_JOB_ID}.pkl

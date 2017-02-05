@@ -1,0 +1,11 @@
+#!/bin/bash
+#SBATCH --job-name=PT-wine
+#SBATCH --ntasks=4
+#SBATCH --nodes=1
+#SBATCH --mem=8192
+#SBATCH --time=0-23:59:59 
+#SBATCH --mail-type=begin,end,fail,requeue 
+#SBATCH --export=all 
+#SBATCH --out=output/tuner/tuner-wine-%j.out
+
+python parameter_tuner.py wine output/tuner/tuner-wine-${SLURM_JOB_ID}.pkl
