@@ -9,4 +9,4 @@
 #SBATCH --export=all 
 #SBATCH --out=output/main/glass-%A-%a.out
 
-python main.py glass ${SLURM_ARRAY_TASK_ID}
+python main.py glass ${SLURM_ARRAY_TASK_ID} --rho 0.6560523795153244 --alpha 0.9474802189242502 --beta 0.9075508529758585

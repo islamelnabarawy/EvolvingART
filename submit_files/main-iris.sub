@@ -9,4 +9,4 @@
 #SBATCH --export=all 
 #SBATCH --out=output/main/iris-%A-%a.out
 
-python main.py iris ${SLURM_ARRAY_TASK_ID}
+python main.py iris ${SLURM_ARRAY_TASK_ID} --rho 0.4859630049307109 --alpha 0.9187501071383675 --beta 0.9823371039736339
