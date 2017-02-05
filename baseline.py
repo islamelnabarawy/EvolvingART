@@ -46,28 +46,38 @@ def main():
     parser.add_argument("--beta", type=float, required=False, default=BETA)
     args = parser.parse_args()
 
-    train_filenames = [(ix, TRAIN_FILE_FORMAT.format(args.dataset, ix), args.rho, args.alpha, args.beta)
-                       for ix in range(NUM_FOLDS)]
-    test_filenames = [(ix, TEST_FILE_FORMAT.format(args.dataset, ix), args.rho, args.alpha, args.beta)
-                      for ix in range(NUM_FOLDS)]
+    test_results, train_results = run(args.dataset, args.rho, args.alpha, args.beta)
+    print("Results:")
+    print_results(train_results, test_results)
 
+
+def run(dataset, rho, alpha, beta):
+    train_filenames = [(ix, TRAIN_FILE_FORMAT.format(dataset, ix), rho, alpha, beta)
+                       for ix in range(NUM_FOLDS)]
+    test_filenames = [(ix, TEST_FILE_FORMAT.format(dataset, ix), rho, alpha, beta)
+                      for ix in range(NUM_FOLDS)]
     pool = multiprocessing.Pool()
     train_results = pool.map(evaluate_train, train_filenames)
     test_results = pool.map(evaluate_test, test_filenames)
-    print("Training set results:")
-    print_results(train_results)
-    print("Testing set results:")
-    print_results(test_results)
+    return test_results, train_results
 
 
-def print_results(results):
+def print_results(train_results, test_results):
     x = PrettyTable()
-    x.field_names = ['Idx', 'Iter', 'Clusters', 'Performance']
-    for row in results:
-        x.add_row(row)
-    avg = np.array(results, dtype=float)[:, 1:].mean(axis=0)
-    x.add_row(['Avg'] + list(avg))
+    x.field_names = ['Idx', 'Train Iter', 'Train Clusters', 'Train Performance',
+                     'Test Iter', 'Test Clusters', 'Test Performance']
+    for ix in range(NUM_FOLDS):
+        x.add_row(train_results[ix] + test_results[ix][1:])
+    train_avg = get_average(train_results)
+    test_avg = get_average(test_results)
+    x.add_row(['-' * len(f) for f in x.field_names])
+    x.add_row(['Avg'] + list(train_avg) + list(test_avg))
     print(x)
+
+
+def get_average(results):
+    avg = np.array(results, dtype=float)[:, 1:].mean(axis=0)
+    return avg
 
 
 if __name__ == '__main__':
