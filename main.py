@@ -1,6 +1,7 @@
 import argparse
 import operator
 import multiprocessing
+import logging
 
 from deap import creator
 from deap import base
@@ -19,14 +20,14 @@ from ART import OnlineFuzzyART
 __author__ = 'Islam Elnabarawy'
 
 # FuzzyART algorithm parameters
-rho, alpha, beta = 0.6, 0.05, 0.95
+RHO, ALPHA, BETA = 0.6, 0.05, 0.95
 # rho, alpha, beta = 0.5173929115731474, 0.47460905154087896, 0.6250151337909732   # iris.data
 # rho, alpha, beta = 0.4249555132101839, 0.0011891228422072908, 0.5315274236032594   # glass.data
 
 NUM_FOLDS = 10
 
 
-def evaluate(individual, compile, dataset, labels):
+def evaluate(individual, compile, dataset, labels, rho, alpha, beta):
     # Transform the tree expression in a callable function
     func = compile(expr=individual)
     # print("Evaluating individual: %s" % individual)
@@ -82,7 +83,7 @@ creator.create("FitnessMax", base.Fitness, weights=(1.0,))
 creator.create("Individual", gp.PrimitiveTree, fitness=creator.FitnessMax)
 
 
-def run_fold(dataset_name, fold_index):
+def run_fold(dataset_name, fold_index, rho, alpha, beta):
 
     train_file = 'data/crossvalidation/{}/{}.train.arff'.format(dataset_name, fold_index)
     test_file = 'data/crossvalidation/{}/{}.test.arff'.format(dataset_name, fold_index)
@@ -101,7 +102,9 @@ def run_fold(dataset_name, fold_index):
     train_dataset, train_labels = read_arff_dataset(train_file)
     test_dataset, test_labels = read_arff_dataset(test_file)
 
-    toolbox.register("evaluate", evaluate, compile=toolbox.compile, dataset=train_dataset, labels=train_labels)
+    toolbox.register("evaluate", evaluate,
+                     compile=toolbox.compile, dataset=train_dataset,
+                     labels=train_labels, rho=rho, alpha=alpha, beta=beta)
     toolbox.register("select", tools.selBest)
     toolbox.register("mate", gp.cxOnePoint)
     toolbox.register("expr_mut", gp.genFull, min_=0, max_=2)
@@ -129,12 +132,12 @@ def run_fold(dataset_name, fold_index):
 
     print("Training set fitness:")
     for expr in hof:
-        train_fitness = evaluate(expr, toolbox.compile, train_dataset, train_labels)
+        train_fitness = evaluate(expr, toolbox.compile, train_dataset, train_labels, rho, alpha, beta)
         print('\t', expr, train_fitness)
 
     print("Test set fitness:")
     for expr in hof:
-        test_fitness = evaluate(expr, toolbox.compile, test_dataset, test_labels)
+        test_fitness = evaluate(expr, toolbox.compile, test_dataset, test_labels, rho, alpha, beta)
         print('\t', expr, test_fitness)
 
     return pop, hof, log
@@ -146,11 +149,15 @@ def main():
                         help="The index of the fold to evaluate")
     parser.add_argument("fold", type=int, choices=range(NUM_FOLDS),
                         help="The index of the fold to evaluate")
+    parser.add_argument("--rho", type=float, required=False, default=RHO)
+    parser.add_argument("--alpha", type=float, required=False, default=ALPHA)
+    parser.add_argument("--beta", type=float, required=False, default=BETA)
     args = parser.parse_args()
 
     print("Dataset: {}".format(args.dataset))
-    print("Fold: {}/{}\n".format(args.fold+1, NUM_FOLDS))
-    run_fold(args.dataset, args.fold)
+    print("Fold: {}/{}".format(args.fold+1, NUM_FOLDS))
+    print("Parameters:\n\trho = {}\n\talpha = {}\n\tbeta = {}".format(args.rho, args.alpha, args.beta))
+    run_fold(args.dataset, args.fold, args.rho, args.alpha, args.beta)
     print("\nFold {}/{} done.\n".format(args.fold+1, NUM_FOLDS))
 
 
