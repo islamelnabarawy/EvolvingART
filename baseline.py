@@ -46,6 +46,8 @@ def main():
     parser.add_argument("--beta", type=float, required=False, default=BETA)
     args = parser.parse_args()
 
+    print("Dataset: {}".format(args.dataset))
+    print("Parameters:\n\trho = {}\n\talpha = {}\n\tbeta = {}".format(args.rho, args.alpha, args.beta))
     test_results, train_results = run(args.dataset, args.rho, args.alpha, args.beta)
     print("Results:")
     print_results(train_results, test_results)
