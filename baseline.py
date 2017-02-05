@@ -60,7 +60,8 @@ def run(dataset, rho, alpha, beta):
         pool = multiprocessing.Pool()
         map_fn = pool.map
     except BlockingIOError:
-        map_fn = map
+        def map_fn(x, y):
+            return list(map(x, y))
     train_results = map_fn(evaluate_train, train_filenames)
     test_results = map_fn(evaluate_test, test_filenames)
     return test_results, train_results
