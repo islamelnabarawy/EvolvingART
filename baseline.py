@@ -56,9 +56,13 @@ def run(dataset, rho, alpha, beta):
                        for ix in range(NUM_FOLDS)]
     test_filenames = [(ix, TEST_FILE_FORMAT.format(dataset, ix), rho, alpha, beta)
                       for ix in range(NUM_FOLDS)]
-    pool = multiprocessing.Pool()
-    train_results = pool.map(evaluate_train, train_filenames)
-    test_results = pool.map(evaluate_test, test_filenames)
+    try:
+        pool = multiprocessing.Pool()
+        map_fn = pool.map
+    except BlockingIOError:
+        map_fn = map
+    train_results = map_fn(evaluate_train, train_filenames)
+    test_results = map_fn(evaluate_test, test_filenames)
     return test_results, train_results
 
 
