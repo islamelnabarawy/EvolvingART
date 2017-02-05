@@ -7,6 +7,6 @@
 #SBATCH --time=2-0:0:0 
 #SBATCH --mail-type=begin,end,fail,requeue 
 #SBATCH --export=all 
-#SBATCH --out=output/main/glass-%A-%n-%a.out
+#SBATCH --out=output/main/glass-%A-%a.out
 
 python main.py glass ${SLURM_ARRAY_TASK_ID}

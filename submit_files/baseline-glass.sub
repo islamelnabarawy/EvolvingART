@@ -7,6 +7,6 @@
 #SBATCH --time=1-0:0:0
 #SBATCH --mail-type=begin,end,fail,requeue 
 #SBATCH --export=all 
-#SBATCH --out=output/baseline/baseline-glass-%j.out
+#SBATCH --out=output/baseline/baseline-glass-%A-%a.out
 
 python baseline.py glass --rho 0.6560523795153244 --alpha 0.9474802189242502 --beta 0.9075508529758585
