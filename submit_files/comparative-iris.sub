@@ -2,11 +2,19 @@
 #SBATCH --job-name=CMP-iris
 #SBATCH --ntasks=4
 #SBATCH --nodes=1
-#SBATCH --array=0-9%10
+#SBATCH --array=1-30%10
 #SBATCH --mem=8192
 #SBATCH --time=1-0:0:0
 #SBATCH --mail-type=begin,end,fail,requeue 
 #SBATCH --export=all 
 #SBATCH --out=output/comparative/comparative-iris-%A-%a.out
 
-python baseline.py iris --rho 0.4859630049307109 --alpha 0.9187501071383675 --beta 0.9823371039736339
+RAND=$(awk -v line=${SLURM_ARRAY_TASK_ID} '{if (NR == line) { print $0; };}' ./random.data)
+CMD="python baseline.py iris --rho 0.4859630049307109 --alpha 0.9187501071383675 --beta 0.9823371039736339 --rand $RAND"
+
+$CMD
+
+for i in {0..9}; do
+    CCF=$(awk -v line=$(($i+1)) '{if (NR == line) { print $0; };}' ./ccf/iris.ccf)
+    $CMD --ccf $CCF
+done
