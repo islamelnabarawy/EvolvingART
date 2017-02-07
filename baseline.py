@@ -5,12 +5,16 @@ import numpy as np
 from sklearn.metrics import adjusted_rand_score
 from prettytable import PrettyTable
 
+from deap import gp
+
 from data.read_dataset import read_arff_dataset
 from ART import OnlineFuzzyART
+from main import get_primitive_set
 
 __author__ = 'Islam Elnabarawy'
 
 RHO, ALPHA, BETA = 0.6, 0.05, 0.95
+DEFAULT_CHOICE_FN = 'protected_div(max_norm(fuzzy_and(A, w_j)), add(alpha, max_norm(w_j)))'
 # rho, alpha, beta = 0.5173929115731474, 0.47460905154087896, 0.6250151337909732       # iris.data
 # rho, alpha, beta = 0.4249555132101839, 0.0011891228422072908, 0.5315274236032594     # glass.data
 
@@ -20,21 +24,26 @@ TRAIN_FILE_FORMAT = 'data/crossvalidation/{}/{}.train.arff'
 
 
 def evaluate_train(args):
-    ix, filename, rho, alpha, beta = args
+    ix, filename, rho, alpha, beta, ccf = args
     dataset, labels = read_arff_dataset(filename)
-    fa = OnlineFuzzyART(rho, alpha, beta, dataset.shape[1])
+    fa = OnlineFuzzyART(rho, alpha, beta, dataset.shape[1], choice_fn=get_choice_fn(ccf))
     iterations, clusters = fa.run_batch(dataset, max_epochs=10)
     performance = adjusted_rand_score(labels, clusters)
     return ix, iterations, fa.num_clusters, performance
 
 
 def evaluate_test(args):
-    ix, filename, rho, alpha, beta = args
+    ix, filename, rho, alpha, beta, ccf = args
     dataset, labels = read_arff_dataset(filename)
-    fa = OnlineFuzzyART(rho, alpha, beta, dataset.shape[1])
+    fa = OnlineFuzzyART(rho, alpha, beta, dataset.shape[1], choice_fn=get_choice_fn(ccf))
     iterations, clusters = fa.run_batch(dataset, max_epochs=10)
     performance = adjusted_rand_score(labels, clusters)
     return ix, iterations, fa.num_clusters, performance
+
+
+def get_choice_fn(expr):
+    tree = gp.PrimitiveTree.from_string(expr, get_primitive_set())
+    return gp.compile(tree, get_primitive_set())
 
 
 def main():
@@ -44,19 +53,22 @@ def main():
     parser.add_argument("--rho", type=float, required=False, default=RHO)
     parser.add_argument("--alpha", type=float, required=False, default=ALPHA)
     parser.add_argument("--beta", type=float, required=False, default=BETA)
+    parser.add_argument("--ccf", required=False, default=DEFAULT_CHOICE_FN)
     args = parser.parse_args()
 
     print("Dataset: {}".format(args.dataset))
     print("Parameters:\n\trho = {}\n\talpha = {}\n\tbeta = {}".format(args.rho, args.alpha, args.beta))
-    test_results, train_results = run(args.dataset, args.rho, args.alpha, args.beta)
+    print("Category choice function:\n\t{}".format(args.ccf))
+
+    test_results, train_results = run(args.dataset, args.rho, args.alpha, args.beta, args.ccf)
     print("Results:")
     print_results(train_results, test_results)
 
 
-def run(dataset, rho, alpha, beta):
-    train_filenames = [(ix, TRAIN_FILE_FORMAT.format(dataset, ix), rho, alpha, beta)
+def run(dataset, rho, alpha, beta, ccf):
+    train_filenames = [(ix, TRAIN_FILE_FORMAT.format(dataset, ix), rho, alpha, beta, ccf)
                        for ix in range(NUM_FOLDS)]
-    test_filenames = [(ix, TEST_FILE_FORMAT.format(dataset, ix), rho, alpha, beta)
+    test_filenames = [(ix, TEST_FILE_FORMAT.format(dataset, ix), rho, alpha, beta, ccf)
                       for ix in range(NUM_FOLDS)]
     try:
         pool = multiprocessing.Pool()
