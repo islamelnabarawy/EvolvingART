@@ -1,0 +1,12 @@
+#!/bin/bash
+#SBATCH --job-name=CMP-wine
+#SBATCH --ntasks=4
+#SBATCH --nodes=1
+#SBATCH --array=0-9%10
+#SBATCH --mem=8192
+#SBATCH --time=1-0:0:0
+#SBATCH --mail-type=begin,end,fail,requeue 
+#SBATCH --export=all 
+#SBATCH --out=output/comparative/comparative-wine-%A-%a.out
+
+python baseline.py wine --rho 0.3750318760302366 --alpha 0.8618979450558234 --beta 0.9797385947505884
