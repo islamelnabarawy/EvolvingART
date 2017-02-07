@@ -45,13 +45,15 @@ def main():
                         help="The extension of the file names")
     args = parser.parse_args()
 
-    print("Dataset: {}".format(args.dataset))
-    print("Path: {}".format(args.path))
-    print("Extension: {}".format(args.extension))
+    process_data(args.dataset, args.extension, args.path)
 
-    dir_name = os.path.join(args.path, '{}-avg'.format(args.dataset))
-    files = [i for i in os.listdir(dir_name) if i.endswith(args.extension)]
 
+def process_data(dataset, extension, path):
+    print("Dataset: {}".format(dataset))
+    print("Path: {}".format(path))
+    print("Extension: {}".format(extension))
+    dir_name = os.path.join(path, '{}-avg'.format(dataset))
+    files = [i for i in os.listdir(dir_name) if i.endswith(extension)]
     data = []
     train_results = np.zeros((len(files), 11), dtype=float)
     test_results = np.zeros((len(files), 11), dtype=float)
@@ -61,9 +63,8 @@ def main():
         train, test = result['training']['performance'], result['testing']['performance']
         train_results[ix, :] = train
         test_results[ix, :] = test
-
-    write_results(os.path.join(args.path, '{}-train.csv'.format(args.dataset)), train_results)
-    write_results(os.path.join(args.path, '{}-test.csv'.format(args.dataset)), test_results)
+    write_results(os.path.join(path, '{}-train.csv'.format(dataset)), train_results)
+    write_results(os.path.join(path, '{}-test.csv'.format(dataset)), test_results)
 
 
 def write_results(filename, results):
@@ -82,10 +83,13 @@ def write_results(filename, results):
         writer.writerow(['t-statistic'] + list(t_stats[0, :]))
         writer.writerow(['p-value'] + list(t_stats[1, :]))
         writer.writerow(['better mean'] + [results_mean[i] > results_mean[0] for i in range(11)])
-        writer.writerow(['significant'] + [t_stats[1, i] > 0.05 for i in range(11)])
+        writer.writerow(['significant'] + [t_stats[1, i] < 0.05 for i in range(11)])
         writer.writerow(['significantly better'] +
-                        [results_mean[i] > results_mean[0] and t_stats[1, i] > 0.05 for i in range(11)])
+                        [results_mean[i] > results_mean[0] and t_stats[1, i] < 0.05 for i in range(11)])
 
 
 if __name__ == '__main__':
-    main()
+    # main()
+    for dataset in ['glass', 'iris', 'wine']:
+        process_data(dataset, '.out', 'output/comparative/')
+        process_data(dataset, '.out', 'output/comp100/')
