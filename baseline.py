@@ -24,19 +24,19 @@ TRAIN_FILE_FORMAT = 'data/crossvalidation/{}/{}.train.arff'
 
 
 def evaluate_train(args):
-    ix, filename, rho, alpha, beta, ccf = args
+    ix, filename, rho, alpha, beta, ccf, rand = args
     dataset, labels = read_arff_dataset(filename)
     fa = OnlineFuzzyART(rho, alpha, beta, dataset.shape[1], choice_fn=get_choice_fn(ccf))
-    iterations, clusters = fa.run_batch(dataset, max_epochs=10)
+    iterations, clusters = fa.run_batch(dataset, max_epochs=10, seed=rand)
     performance = adjusted_rand_score(labels, clusters)
     return ix, iterations, fa.num_clusters, performance
 
 
 def evaluate_test(args):
-    ix, filename, rho, alpha, beta, ccf = args
+    ix, filename, rho, alpha, beta, ccf, rand = args
     dataset, labels = read_arff_dataset(filename)
     fa = OnlineFuzzyART(rho, alpha, beta, dataset.shape[1], choice_fn=get_choice_fn(ccf))
-    iterations, clusters = fa.run_batch(dataset, max_epochs=10)
+    iterations, clusters = fa.run_batch(dataset, max_epochs=10, seed=rand)
     performance = adjusted_rand_score(labels, clusters)
     return ix, iterations, fa.num_clusters, performance
 
@@ -54,21 +54,22 @@ def main():
     parser.add_argument("--alpha", type=float, required=False, default=ALPHA)
     parser.add_argument("--beta", type=float, required=False, default=BETA)
     parser.add_argument("--ccf", required=False, default=DEFAULT_CHOICE_FN)
+    parser.add_argument("--rand", type=int, required=False, default=None)
     args = parser.parse_args()
 
     print("Dataset: {}".format(args.dataset))
     print("Parameters:\n\trho = {}\n\talpha = {}\n\tbeta = {}".format(args.rho, args.alpha, args.beta))
     print("Category choice function:\n\t{}".format(args.ccf))
 
-    test_results, train_results = run(args.dataset, args.rho, args.alpha, args.beta, args.ccf)
+    test_results, train_results = run(args.dataset, args.rho, args.alpha, args.beta, args.ccf, args.rand)
     print("Results:")
     print_results(train_results, test_results)
 
 
-def run(dataset, rho, alpha, beta, ccf):
-    train_filenames = [(ix, TRAIN_FILE_FORMAT.format(dataset, ix), rho, alpha, beta, ccf)
+def run(dataset, rho, alpha, beta, ccf, rand):
+    train_filenames = [(ix, TRAIN_FILE_FORMAT.format(dataset, ix), rho, alpha, beta, ccf, rand)
                        for ix in range(NUM_FOLDS)]
-    test_filenames = [(ix, TEST_FILE_FORMAT.format(dataset, ix), rho, alpha, beta, ccf)
+    test_filenames = [(ix, TEST_FILE_FORMAT.format(dataset, ix), rho, alpha, beta, ccf, rand)
                       for ix in range(NUM_FOLDS)]
     try:
         pool = multiprocessing.Pool()
