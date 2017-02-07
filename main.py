@@ -1,7 +1,6 @@
 import argparse
 import operator
 import multiprocessing
-import logging
 
 from deap import creator
 from deap import base
@@ -146,7 +145,7 @@ def run_fold(dataset_name, fold_index, rho, alpha, beta):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("dataset", choices=['wine', 'iris', 'glass'],
-                        help="The index of the fold to evaluate")
+                        help="The name of the dataset to process")
     parser.add_argument("fold", type=int, choices=range(NUM_FOLDS),
                         help="The index of the fold to evaluate")
     parser.add_argument("--rho", type=float, required=False, default=RHO)
