@@ -59,6 +59,8 @@ def main():
 
     print("Dataset: {}".format(args.dataset))
     print("Parameters:\n\trho = {}\n\talpha = {}\n\tbeta = {}".format(args.rho, args.alpha, args.beta))
+    if args.rand:
+        print("Random seed: {}".format(args.rand))
     print("Category choice function:\n\t{}".format(args.ccf))
 
     test_results, train_results = run(args.dataset, args.rho, args.alpha, args.beta, args.ccf, args.rand)
