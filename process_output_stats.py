@@ -2,7 +2,10 @@ import argparse
 import csv
 import os
 
+from prettytable import PrettyTable
+
 import numpy as np
+import scipy.stats as stats
 
 __author__ = 'Islam Elnabarawy'
 
@@ -42,6 +45,10 @@ def main():
                         help="The extension of the file names")
     args = parser.parse_args()
 
+    print("Dataset: {}".format(args.dataset))
+    print("Path: {}".format(args.path))
+    print("Extension: {}".format(args.extension))
+
     dir_name = os.path.join(args.path, '{}-avg'.format(args.dataset))
     files = [i for i in os.listdir(dir_name) if i.endswith(args.extension)]
 
@@ -68,6 +75,16 @@ def write_results(filename, results):
         results_mean = results.mean(axis=0)
         writer.writerow(['Avg'] + list(results_mean) + [np.argmax(results_mean)])
         writer.writerow(['Stdev'] + list(results.std(axis=0)))
+        # calculate t-test results
+        t_stats = np.zeros((2, 11), dtype=float)
+        for i in range(1, 11):
+            t_stats[:, i] = stats.ttest_ind(results[:, 0], results[:, i])
+        writer.writerow(['t-statistic'] + list(t_stats[0, :]))
+        writer.writerow(['p-value'] + list(t_stats[1, :]))
+        writer.writerow(['better mean'] + [results_mean[i] > results_mean[0] for i in range(11)])
+        writer.writerow(['significant'] + [t_stats[1, i] > 0.05 for i in range(11)])
+        writer.writerow(['significantly better'] +
+                        [results_mean[i] > results_mean[0] and t_stats[1, i] > 0.05 for i in range(11)])
 
 
 if __name__ == '__main__':
