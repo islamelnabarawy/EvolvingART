@@ -46,8 +46,8 @@ def main():
     files = [i for i in os.listdir(dir_name) if i.endswith(args.extension)]
 
     data = []
-    train_results = np.zeros((30, 11), dtype=float)
-    test_results = np.zeros((30, 11), dtype=float)
+    train_results = np.zeros((len(files), 11), dtype=float)
+    test_results = np.zeros((len(files), 11), dtype=float)
     for ix, f in enumerate(files):
         result = process_file(os.path.join(dir_name, f))
         data.append(result)
