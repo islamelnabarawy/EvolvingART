@@ -2,7 +2,7 @@
 #SBATCH --job-name=CMP-wine
 #SBATCH --ntasks=4
 #SBATCH --nodes=1
-#SBATCH --array=1-30%10
+#SBATCH --array=1-30%30
 #SBATCH --mem=8192
 #SBATCH --time=1-0:0:0
 #SBATCH --mail-type=begin,end,fail,requeue 
@@ -16,5 +16,5 @@ $CMD
 
 for i in {0..9}; do
     CCF=$(awk -v line=$(($i+1)) '{if (NR == line) { print $0; };}' ./ccf/wine.ccf)
-    $CMD --ccf $CCF
+    $CMD --ccf "$CCF"
 done
