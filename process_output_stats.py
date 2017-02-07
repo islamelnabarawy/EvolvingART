@@ -67,8 +67,7 @@ def write_results(filename, results):
             writer.writerow([ix+1] + list(row) + [np.argmax(row)])
         results_mean = results.mean(axis=0)
         writer.writerow(['Avg'] + list(results_mean) + [np.argmax(results_mean)])
-        results_std = results.std(axis=0)
-        writer.writerow(['Stdev'] + list(results_std) + [np.argmax(results_std)])
+        writer.writerow(['Stdev'] + list(results.std(axis=0)))
 
 
 if __name__ == '__main__':
