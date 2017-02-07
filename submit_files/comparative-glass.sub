@@ -2,12 +2,12 @@
 #SBATCH --job-name=CMP-glass
 #SBATCH --ntasks=4
 #SBATCH --nodes=1
-#SBATCH --array=1-30%30
+#SBATCH --array=1-100%10
 #SBATCH --mem=8192
 #SBATCH --time=1-0:0:0
 #SBATCH --mail-type=begin,end,fail,requeue 
 #SBATCH --export=all 
-#SBATCH --out=output/comparative/comparative-glass-%A-%a.out
+#SBATCH --out=output/comp100/glass-%A-%a.out
 
 RAND=$(awk -v line=${SLURM_ARRAY_TASK_ID} '{if (NR == line) { print $0; };}' ./random.data)
 CMD="python baseline.py glass --rho 0.6560523795153244 --alpha 0.9474802189242502 --beta 0.9075508529758585 --rand $RAND"
